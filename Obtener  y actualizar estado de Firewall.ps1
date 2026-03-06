@@ -1,20 +1,13 @@
-﻿
-Function Get-menu{
+#Ejecutar como administrador
+
+Function Opciones-Principal{
 Write-host "1.- Obtener estado"
 Write-host "2.- Actualizar estado"
 Write-host "3.- Salir"
 }
 
-Function Get-obtener {
-Write-Host "---------------------------------"
-Write-Host "Obteniendo estado de perfiles de Firewall"
-Write-Host "---------------------------------"
-Get-NetFirewallProfile | Select-Object name, enabled
-Write-Host "---------------------------------"
-}
-
-Function Get-menu-actualizar {
-Write-Host "---------------------------------"
+Function Opciones-Update {
+Write-Host "----------------------------------------"
 Write-Host "Opciones:"
 Write-Host "1-Todos los perfiles"
 Write-Host "2-Domain"
@@ -22,64 +15,82 @@ Write-Host "3-Private"
 Write-Host "4-Public"
 Write-Host "5-Salir"
 Write-Host "Seleccione la opción:"
-Write-Host "---------------------------------"
+Write-Host "----------------------------------------"
 }
 
-Function Get-activar-perfiles {
-    #Set-NetFirewallProfile -enable true
+Function Opciones-ActivarDesactivar {
+Write-host "1.- Activar"
+Write-host "2.- Desactivar"
+Write-host "3.- Salir"
+}
+
+Function Get-Perfil {
+Write-Host "----------------------------------------"
+Write-Host "Obteniendo estado de perfiles de Firewall"
+Write-Host "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+Get-NetFirewallProfile | Select-Object name, enabled
+Write-Host "----------------------------------------"
+}
+
+Function Activar-perfiles {
 Clear-Host
-Write-Host "---------------------------------"
+Write-Host "----------------------------------------"
 Write-Host "Actualizando estado de perfiles"
-Write-Host "Activando todos los perfiles..."
-Write-Host "OK-Estado de perfiles actualizado"
-Write-Host "---------------------------------"
-Get-obtener
-Write-Host "---------------------------------"
+Set-NetFirewallProfile -enabled true
+Write-Host "Cargando..."
+Write-Host "Listo"
+Get-Perfil
+Write-Host "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 }
 
-Function Get-desactivar-perfiles {
-    #Set-NetFirewallProfile -enable false
-Write-Host "---------------------------------"
+Function Desactivar-perfiles {
+Clear-Host
+Write-Host "----------------------------------------"
 Write-Host "Actualizando estado de perfiles"
-Write-Host "---------------------------------"
+Set-NetFirewallProfile -enabled false
+Write-Host "Cargando..."
+Write-Host "Listo"
+Write-Host "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
+Get-Perfil
+Write-Host "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+"
 }
 
-Function Get-activar-dominio {
+Function Activar-dominio {
     #Set-NetFirewallProfile -Profile dominio -Enabled True
 Write-Host "---------------------------------"
 Write-Host "Actualizando estado del perfil dominio"
 Write-Host "---------------------------------"
 }
 
-Function Get-desactivar-dominio {
+Function Desactivar-dominio {
     #Set-NetFirewallProfile -Profile dominio -Enabled False
 Write-Host "---------------------------------"
 Write-Host "Actualizando estado del perfil dominio"
 Write-Host "---------------------------------"
 }
 
-Function Get-activar-privado {
+Function Activar-privado {
     #Set-NetFirewallProfile -Profile privado -Enabled True    
 Write-Host "---------------------------------"
 Write-Host "Actualizando estado del perfil privado"
 Write-Host "---------------------------------"
 }
 
-Function Get-desactivar-privado {
+Function Desactivar-privado {
     #Set-NetFirewallProfile -Profile privado -Enabled False    
 Write-Host "---------------------------------"
 Write-Host "Actualizando estado del perfil privado"
 Write-Host "---------------------------------"
 }
 
-Function Get-activar-public {
+Function Activar-public {
     #Set-NetFirewallProfile -Profile public -Enabled True    
 Write-Host "---------------------------------"
 Write-Host "Actualizando estado del perfil public"
 Write-Host "---------------------------------"
 }
 
-Function Get-desactivar-public {
+Function Desactivar-public {
     #Set-NetFirewallProfile -Profile public -Enabled False    
 Write-Host "---------------------------------"
 Write-Host "Actualizando estado del perfil public"
@@ -87,21 +98,20 @@ Write-Host "---------------------------------"
 }
 
 Function Menu-principal {
-
 While (($valor = Read-Host "Selecionar opción") -ne "3")
   {
     switch ($valor)
         {
             1 {
                 Clear-host
-                Get-obtener
+                Get-Perfil
                 pause;
                 break
               }
             2 {
                 Clear-host
-                Get-menu-actualizar
-                Get-Menu-update
+                Opciones-Update
+                Menu-update
                 pause;
                 break
               }
@@ -116,23 +126,28 @@ While (($valor = Read-Host "Selecionar opción") -ne "3")
 
         }
     Clear-host
-    Get-menu
+    Opciones-principal
    }
 
 }
 
-Function Get-Menu-update {
+Function Menu-update {
 
 while (($valor_update = Read-Host "Selecionar opción") -ne "5")
     {
     switch ($valor_update)
         {
             1 {
-                if (Get-NetFirewallProfile |Where-Object {$_.Enabled -eq "True"})
+                Opciones-ActivarDesactivar
+                $valor_ActivarDesactivar = Read-Host "Selecionar opción:"
+                if ($valor_ActivarDesactivar -eq "1")
                 {
-                 Get-activar-perfiles
-                } else {
-                 Get-desactivar-perfiles
+                 Activar-perfiles
+                } elseif ($valor_ActivarDesactivar -eq "2") {
+                 Desactivar-perfiles
+                }
+                else {
+                 break
                 }
                 pause;
                 break
@@ -140,9 +155,9 @@ while (($valor_update = Read-Host "Selecionar opción") -ne "5")
             2 {
                 if (Get-NetFirewallProfile -Profile Domain |Where-Object {$_.Enabled -eq "True"})
                 {
-                 Get-activar-dominio
+                 Activar-dominio
                 } else {
-                 Get-desactivar-dominio
+                 Desactivar-dominio
                 }
                 pause;
                 break
@@ -150,9 +165,9 @@ while (($valor_update = Read-Host "Selecionar opción") -ne "5")
             3 {
                 if (Get-NetFirewallProfile -Profile Private | Where-Object {$_.Enabled -eq "True"})
                 {
-                 Get-activar-privado
+                 Activar-privado
                 } else {
-                 Get-desactivar-dominio
+                 Desactivar-dominio
                 }
                 pause;
                 break
@@ -160,9 +175,9 @@ while (($valor_update = Read-Host "Selecionar opción") -ne "5")
             4 {
                 if (Get-NetFirewallProfile -Profile Public | Where-Object {$_.Enabled -eq "True"})
                 {
-                 Get-activar-public
+                 Activar-public
                 } else {
-                 Get-desactivar-public
+                 Desactivar-public
                 }
                 pause;
                 break
@@ -178,12 +193,13 @@ while (($valor_update = Read-Host "Selecionar opción") -ne "5")
 
         }
     
-    Get-menu-actualizar
+    Opciones-Update
 
     }
 }
 
 
+
 Write-host "Iniciando..."
-Get-menu
+Opciones-Principal
 Menu-principal
